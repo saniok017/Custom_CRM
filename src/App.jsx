@@ -20,17 +20,6 @@ import Settings from './pages/Settings';
 import './App.css';
 import Button from 'react-bootstrap/Button';
 
-// Router guard component to protect routes
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = useIsAuthenticated();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-};
-
 /**
  * Renders information about the signed-in user or a button to retrieve data about the user
  */
@@ -90,11 +79,9 @@ export default function App() {
                                         </MainLayout>
                                 } />
                                 <Route path="/accounts" element={
-                                    <ProtectedRoute>
                                         <MainLayout>
                                             <Accounts />
                                         </MainLayout>
-                                    </ProtectedRoute>
                                 } />
                                 <Route path="/analytics" element={
                                         <MainLayout>

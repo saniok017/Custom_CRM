@@ -33,12 +33,6 @@ const Navigation = () => {
 
     const navItems = [
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-        { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
-        { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
-        { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-    ];
-    const ExtendedNavItems = [
-        { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
         { text: 'Accounts', icon: <BusinessIcon />, path: '/accounts' },
         { text: 'Contacts', icon: <PeopleIcon />, path: '/contacts' },
         { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
@@ -48,7 +42,7 @@ const Navigation = () => {
     return (
         <Box sx={{ width: '100%' }}>
             <List component="nav">
-                {(isAuthenticated ? ExtendedNavItems : navItems).map((item) => (
+                {navItems.map((item) => (
                     <NavItem
                         button
                         component={Link}
