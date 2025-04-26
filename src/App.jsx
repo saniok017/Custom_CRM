@@ -1,18 +1,39 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal, useIsAuthenticated } from '@azure/msal-react';
 
-import { PageLayout } from './components/PageLayout';
+// Authentication components
 import { loginRequest } from './authConfig';
 import { callMsGraph } from './graph';
 import { ProfileData } from './components/ProfileData';
 
-import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
+// Layout and pages
+import { TenantProvider } from './contexts/TenantContext';
+import ThemedApp from './components/layout/ThemedApp';
+import MainLayout from './components/layout/MainLayout';
+import Dashboard from './pages/Dashboard';
+import Contacts from './pages/Contacts';
+import Accounts from './pages/Accounts';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
+
 import './App.css';
 import Button from 'react-bootstrap/Button';
+
+// Router guard component to protect routes
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = useIsAuthenticated();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
 /**
  * Renders information about the signed-in user or a button to retrieve data about the user
  */
-
 const ProfileContent = () => {
     const { instance, accounts } = useMsal();
     const [graphData, setGraphData] = useState(null);
@@ -44,9 +65,9 @@ const ProfileContent = () => {
 };
 
 /**
- * If a user is authenticated the ProfileContent component above is rendered. Otherwise a message indicating a user is not authenticated is rendered.
+ * Main application component that combines authentication with routing
  */
-const MainContent = () => {
+export default function App() {
     return (
         <div className="App">
             <AuthenticatedTemplate>
@@ -54,16 +75,47 @@ const MainContent = () => {
             </AuthenticatedTemplate>
 
             <UnauthenticatedTemplate>
-                <h5 className="card-title">Please sign-in to see your profile information.</h5>
+                <TenantProvider>
+                    <ThemedApp>
+                        <Router>
+                            <Routes>
+                                <Route path="/dashboard" element={
+                                        <MainLayout>
+                                            <Dashboard />
+                                        </MainLayout>
+                                } />
+                                <Route path="/contacts" element={
+                                        <MainLayout>
+                                            <Contacts />
+                                        </MainLayout>
+                                } />
+                                <Route path="/accounts" element={
+                                    <ProtectedRoute>
+                                        <MainLayout>
+                                            <Accounts />
+                                        </MainLayout>
+                                    </ProtectedRoute>
+                                } />
+                                <Route path="/analytics" element={
+                                        <MainLayout>
+                                            <Analytics />
+                                        </MainLayout>
+                                } />
+                                <Route path="/settings" element={
+                                        <MainLayout>
+                                            <Settings />
+                                        </MainLayout>
+                                } />
+                                <Route path="/*" element={
+                                        <MainLayout>
+                                            <Dashboard />
+                                        </MainLayout>
+                                } />
+                            </Routes>
+                        </Router>
+                    </ThemedApp>
+                </TenantProvider>
             </UnauthenticatedTemplate>
         </div>
-    );
-};
-
-export default function App() {
-    return (
-        <PageLayout>
-            <MainContent />
-        </PageLayout>
     );
 }
